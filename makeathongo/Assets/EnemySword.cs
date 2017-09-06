@@ -10,6 +10,7 @@ public class EnemySword : MonoBehaviour {
     public GameObject FrontObjectToFollow;
     public GameObject backEnd;
     public GameObject frontEnd;
+    public GameObject EnBlade;
 
 
     // move speeds and positions of objects
@@ -52,6 +53,7 @@ public class EnemySword : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        backEnd.transform.rotation = EnBlade.transform.rotation;
         SwitchCase();
 
         AttackCooldown();
