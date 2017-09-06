@@ -2,15 +2,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemySword : MonoBehaviour {
+public class EnemySword : MonoBehaviour
+{
 
 
-
+    //Player Sword
     public GameObject BackObjectToFollow;
     public GameObject FrontObjectToFollow;
+    public GameObject PlayerBlade;
+
     public GameObject backEnd;
     public GameObject frontEnd;
     public GameObject EnBlade;
+
+    //Deflect stuff
+    private float EnX;
+    private float EnY;
+
+    public float DeflectlerpSpeed;
+
+    private bool SetAngletValues;
 
 
     // move speeds and positions of objects
@@ -25,7 +36,7 @@ public class EnemySword : MonoBehaviour {
     public float MinDefSpeed;
     public float maxDefSpeed;
     private float DefMoveSpeed;
-  
+
     private bool SetDefendSpeed;
 
     //attack stuff
@@ -33,26 +44,35 @@ public class EnemySword : MonoBehaviour {
     public float MaxAttackTime;
     private float AttackTime;
 
+    public bool Lunging;
+
     private bool CalledAttack;
     private Animator MyAnim2;
 
-    public int Cases  = 3;
+    //duble stuff
+
+    public float MaxRandomAttackMod;
+    public float DubleChance;
+
+    public int Cases=6;
 
     public GameObject Tip;
 
 
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start()
+    {
         BackBasePos.z = BackZ;
         FrontBasePos.z = FrontZ;
         MyAnim2 = this.GetComponent<Animator>();
         Cases = 1;
         AttackTime = Random.Range(MinAttackTime, MaxAttackTime);
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
         backEnd.transform.rotation = EnBlade.transform.rotation;
         SwitchCase();
 
@@ -76,6 +96,18 @@ public class EnemySword : MonoBehaviour {
                 Attack();
                 break;
 
+            case 4:
+                DeflectSoft();
+                break;
+
+            case 5:
+                Deflecthard();
+                break;
+
+            case 6:
+                Duble();
+                break;    
+
             default:
                 Debug.Log("no case");
                 break;
@@ -86,7 +118,7 @@ public class EnemySword : MonoBehaviour {
         BackBasePos = new Vector3(BackObjectToFollow.transform.position.x, BackObjectToFollow.transform.position.y, BackZ);
         backEnd.transform.position = Vector3.Lerp(backEnd.transform.position, BackBasePos, BackLerpSpeed);
 
-       
+
     }
     void MoveFront()
     {
@@ -94,14 +126,7 @@ public class EnemySword : MonoBehaviour {
         frontEnd.transform.position = Vector3.Lerp(frontEnd.transform.position, FrontBasePos, FrontlerpSpeed);
     }
 
-    void AttackCooldown()
-    {
-        AttackTime -= Time.deltaTime;
-        if (AttackTime <= 0)
-        {
-            SwitchToAttack();
-        }
-    }
+
 
     public void SwitchToDefence()
     {
@@ -112,12 +137,65 @@ public class EnemySword : MonoBehaviour {
     public void SwitchToMove()
     {
         Cases = 1;
+        SetAngletValues = false;
     }
 
     public void SwitchToAttack()
     {
         CalledAttack = false;
+     if (DubleChance <=  Random.Range(0,MaxRandomAttackMod))
+            Cases = 6;
+
+     else
         Cases = 3;
+    }
+
+    public void SwitchToDeflectSoft()
+    {
+        Cases = 4;
+        Invoke("SwitchToMove", 1);
+      
+    }
+
+    public void SwitchToDeflecthard()
+    {
+
+        Cases = 5;
+        Invoke("SwitchToMove", 1);
+    }
+
+    public void MovingBack()
+    {
+        Lunging = false;
+    }
+
+    void DeflectSoft()
+    {
+        if (!SetAngletValues)
+        {
+            EnX = EnBlade.transform.rotation.x;
+            EnY = EnBlade.transform.rotation.y;
+            SetAngletValues = true;
+        }
+
+        Vector3 Angle = new Vector3((EnX * 2) + 180, (EnY * 2) + 180, backEnd.transform.rotation.z);
+        backEnd.transform.eulerAngles = Vector3.Lerp(backEnd.transform.eulerAngles, Angle, DeflectlerpSpeed);
+        Debug.Log("Tipsaidsoftdeflect");
+    }
+
+    void Deflecthard()
+    {
+        if (!SetAngletValues)
+        {
+            EnX = EnBlade.transform.rotation.x;
+            EnY = EnBlade.transform.rotation.y;
+            SetAngletValues = true;
+        }
+
+        Vector3 Angle = new Vector3((EnX * 4) + 180, (EnY * 4) + 180, backEnd.transform.rotation.z);
+        backEnd.transform.eulerAngles = Vector3.Lerp(backEnd.transform.eulerAngles, Angle, DeflectlerpSpeed * 2);
+        Debug.Log("Tipsaidharddeflect");
+
     }
 
     void Defend()
@@ -129,21 +207,49 @@ public class EnemySword : MonoBehaviour {
             SetDefendSpeed = true;
         }
 
-        
-            BackBasePos = new Vector3(Tip.transform.position.x, Tip.transform.position.y, BackZ);
-            backEnd.transform.position = Vector3.Lerp(backEnd.transform.position, BackBasePos, DefMoveSpeed);
 
-        
+        BackBasePos = new Vector3(Tip.transform.position.x, Tip.transform.position.y, BackZ);
+        backEnd.transform.position = Vector3.Lerp(backEnd.transform.position, BackBasePos, DefMoveSpeed);
+
+
     }
 
     void Attack()
     {
         if (!CalledAttack)
         {
+            Lunging = true;
             MyAnim2.SetTrigger("EnemyLunge");
             AttackTime = Random.Range(MinAttackTime, MaxAttackTime);
 
+         
+        }
+    }
+    public void MidDuble()
+    {
+        backEnd.transform.eulerAngles = new Vector3(backEnd.transform.rotation.x + Random.Range(1, 15), backEnd.transform.rotation.y + Random.Range(1, 15), backEnd.transform.rotation.z + Random.Range(1, 15));
+    }
+
+    void Duble()
+    {
+        if (!CalledAttack)
+        {
+            Lunging = true;
+
+            AttackTime = Random.Range(MinAttackTime, MaxAttackTime);
             CalledAttack = true;
         }
     }
+
+    void AttackCooldown()
+    {
+        AttackTime -= Time.deltaTime;
+        if (AttackTime <= 0)
+        {
+            SwitchToAttack();
+        }
+    }
+
+
+
 }
