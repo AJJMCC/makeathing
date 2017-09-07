@@ -152,16 +152,23 @@ public class EnemySword : MonoBehaviour
 
     public void SwitchToDeflectSoft()
     {
-        Cases = 4;
-        Invoke("SwitchToMove", 1);
+        if (Cases != 2)
+        {
+            Cases = 4;
+            Invoke("SwitchToMove", 1);
+        }
+       
       
     }
 
     public void SwitchToDeflecthard()
     {
-
-        Cases = 5;
-        Invoke("SwitchToMove", 1);
+        if (Cases != 2)
+        {
+            Cases = 5;
+            Invoke("SwitchToMove", 1);
+        }
+          
     }
 
     public void MovingBack()
@@ -175,6 +182,7 @@ public class EnemySword : MonoBehaviour
         {
             EnX = EnBlade.transform.rotation.x;
             EnY = EnBlade.transform.rotation.y;
+            Lunging = false;
             SetAngletValues = true;
         }
 
@@ -189,6 +197,8 @@ public class EnemySword : MonoBehaviour
         {
             EnX = EnBlade.transform.rotation.x;
             EnY = EnBlade.transform.rotation.y;
+            Lunging = false;
+
             SetAngletValues = true;
         }
 
@@ -221,8 +231,8 @@ public class EnemySword : MonoBehaviour
             Lunging = true;
             MyAnim2.SetTrigger("EnemyLunge");
             AttackTime = Random.Range(MinAttackTime, MaxAttackTime);
-
-         
+            Debug.Log("Attacked");
+            CalledAttack = true;
         }
     }
     public void MidDuble()
@@ -235,8 +245,9 @@ public class EnemySword : MonoBehaviour
         if (!CalledAttack)
         {
             Lunging = true;
-
+            MyAnim2.SetTrigger("EnemyDuble");
             AttackTime = Random.Range(MinAttackTime, MaxAttackTime);
+            Debug.Log("Dubled");
             CalledAttack = true;
         }
     }

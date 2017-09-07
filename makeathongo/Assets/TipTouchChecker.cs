@@ -4,12 +4,11 @@ using UnityEngine;
 
 public class TipTouchChecker : MonoBehaviour {
 
-    public string TagForFronthalf;
-    public string TagForBackHalf;
+    public GameObject EnBody;
 
     public GameObject Parent;
 
-    public GameObject EnSword;
+
 
     public GameObject Sword;
   
@@ -21,30 +20,9 @@ public class TipTouchChecker : MonoBehaviour {
     void OnTriggerEnter(Collider other)
     {
      //   Debug.Log("Logged hit");
-        if (other.tag == TagForBackHalf)
+        if (other.gameObject == EnBody)
         {
-            if (Parent == EnSword)
-            {
-                Parent.GetComponent<EnemySword>().SwitchToDeflecthard();
-            }
-            else if (Parent == Sword)
-            {
-               // Parent.GetComponent<SwordGod>().Deflecthard();
-            }
-        }
 
-        else if (other.tag == TagForFronthalf)
-        {
-            if (Parent == EnSword)
-            {
-                Parent.GetComponent<EnemySword>().SwitchToDeflectSoft();
-            }
-
-
-            else if (Parent == Sword)
-            {
-               // Parent.GetComponent<SwordGod>().DeflectSoft();
-            }
         }
     }
 

@@ -8,10 +8,22 @@ public class SwordGod : MonoBehaviour {
     public GameObject start;
     public GameObject end;
 
+
     public GameObject EnemySwordObj;
+    public GameObject EnBlade;
     private EnemySword enscript;
 
-	void Start ()
+    private float AttackCooldown;
+    public float TimeBetAttacks;
+
+    private float EnX;
+    private float EnY;
+
+    public float DeflectlerpSpeed;
+
+    private bool SetAngletValues;
+
+    void Start ()
     {
         enscript = EnemySwordObj.GetComponent<EnemySword>();
         MyAnim = this.GetComponent<Animator>();
@@ -23,8 +35,13 @@ public class SwordGod : MonoBehaviour {
     {
 		if (Input.GetMouseButtonDown(0))
         {
-            Lungo();
+            if (AttackCooldown <= 0)
+            {
+                Lungo();
+
+            }
         }
+        AttackCooldown -= Time.deltaTime;
 	}
 
     void Lungo()
@@ -44,5 +61,40 @@ public class SwordGod : MonoBehaviour {
         start.GetComponent<MouseReact>().Control = true;
         end.GetComponent<MouseReact>().Control = true;
         enscript.SwitchToMove();
+        AttackCooldown = TimeBetAttacks;
+        SetAngletValues = false;
+    }
+
+
+    public void DeflectHard()
+    {
+        if (!SetAngletValues)
+        {
+            EnX = EnBlade.transform.rotation.x;
+            EnY = EnBlade.transform.rotation.y;
+            //  Lunging = false;
+            SetAngletValues = true;
+        }
+
+        Vector3 Angle = new Vector3((EnX * 2) + 180, (EnY * 2) + 180, start.transform.rotation.z);
+        start.transform.eulerAngles = Vector3.Lerp(start.transform.eulerAngles, Angle, DeflectlerpSpeed * 2);
+        // Debug.Log("Tipsaidsoftdeflect");
+    }
+
+    public void DeflectSoft()
+    {
+        if (!SetAngletValues)
+        {
+            EnX = EnBlade.transform.rotation.x;
+            EnY = EnBlade.transform.rotation.y;
+          //  Lunging = false;
+            SetAngletValues = true;
+        }
+
+        Vector3 Angle = new Vector3((EnX * 2) + 180, (EnY * 2) + 180, start.transform.rotation.z);
+        start.transform.eulerAngles = Vector3.Lerp(start.transform.eulerAngles, Angle, DeflectlerpSpeed);
+        // Debug.Log("Tipsaidsoftdeflect");
+        Debug.Log("PDeflectSoft");
+
     }
 }
